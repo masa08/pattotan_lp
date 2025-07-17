@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pattotan（ぱっとたん）- AI英単語学習アプリ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px; /* 少し余裕を持たせる */
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            min-height: 68px; /* 高さを明確に */
+        }
+
+        header.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.1rem 0.5rem; /* 上下を少し減らし、左右を詰める */
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 32px; /* 左右を広げてバランス調整 */
+            padding-right: 32px;
+            gap: 1.5rem; /* ロゴ・リンク・ボタン間の余白 */
+        }
+
+        .logo {
+            font-size: 2.3rem;
+            font-weight: 800;
+            color: #2194F2;
+            letter-spacing: -0.02em;
+            transition: transform 0.3s ease;
+            margin-right: 2.5rem; /* ロゴとリンクの間隔を広げる */
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2.2rem; /* リンク間の余白を少し詰める */
+            align-items: center;
+            margin-right: 2.5rem; /* CTAボタンとの間隔 */
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 0.95rem;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #2194F2;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #2194F2;
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .cta-button {
+            background: #2194F2;
+            color: white;
+            padding: 0.85rem 2.1rem; /* 少しコンパクトに */
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.98rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin-left: 0; /* 余白リセット */
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(33, 148, 242, 0.3);
+            background: #1976d2;
+        }
+
+        main {
+            margin-top: 85px;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 4rem 0 6rem;
+            color: #333;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            color: #2194F2;
+        }
+
+        .hero .subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            color: #666;
+        }
+
+        .hero .description {
+            font-size: 1.1rem;
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            color: #555;
+        }
+
+        .app-preview {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 4rem;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            color: #2194F2;
+        }
+
+        .hero .subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            color: #666;
+        }
+
+        .hero .description {
+            font-size: 1.1rem;
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            color: #555;
+        }
+
+        .app-preview {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 4rem;
+        }
+
+        .phone-mockup {
+            width: 200px;
+            height: 400px;
+            background: #2194F2;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phone-mockup::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            background: white;
+            border-radius: 15px;
+        }
+
+        .phone-content {
+            position: relative;
+            z-index: 1;
+            color: #333;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .section {
+            background: white;
+            padding: 6rem 0;
+        }
+
+        .section:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+            margin-top: 4rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 4px solid #2194F2;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            color: #2194F2;
+        }
+
+        .pricing-section {
+            background: #f8fafc;
+            color: #333;
+            padding: 6rem 0;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2.5rem;
+            margin-top: 4rem;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .pricing-card:hover {
+            transform: scale(1.05);
+        }
+
+        .pricing-card.featured {
+            background: white;
+            border: 2px solid #2194F2;
+            position: relative;
+            box-shadow: 0 15px 35px rgba(33, 148, 242, 0.2);
+        }
+
+        .pricing-card.featured::before {
+            content: '人気';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2194F2;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .plan-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+
+        .plan-price {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.8rem;
+        }
+
+        .plan-period {
+            opacity: 0.8;
+            margin-bottom: 2.5rem;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: 2.5rem;
+        }
+
+        .plan-features li {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .plan-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .download-section {
+            text-align: center;
+            padding: 6rem 0;
+            background: #f8f9fa;
+        }
+
+        .download-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 2.5rem;
+            margin-top: 2.5rem;
+        }
+
+        .download-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 2rem;
+            background: #333;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .download-button:hover {
+            background: #555;
+        }
+
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 3rem 0;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                padding: 0 18px;
+            }
+            nav {
+                padding-left: 18px;
+                padding-right: 18px;
+            }
+
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .hero .subtitle {
+                font-size: 1.2rem;
+            }
+
+            .section-title {
+                font-size: 2.2rem;
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 2rem;
+            }
+
+            .pricing-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 0.7rem 0;
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            .logo {
+                font-size: 1.7rem;
+                margin-right: 1.2rem;
+            }
+            .nav-links {
+                gap: 1.2rem;
+                margin-right: 1.2rem;
+            }
+
+            .cta-button {
+                padding: 0.8rem 1.8rem;
+                font-size: 0.9rem;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .app-preview {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .features-grid,
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .download-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 7px;
+            }
+            nav {
+                padding: 0.5rem 0;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+            .logo {
+                font-size: 1.3rem;
+                margin-right: 0.5rem;
+            }
+            .nav-links {
+                gap: 0.7rem;
+                margin-right: 0.5rem;
+            }
+
+            .mobile-cta .cta-button {
+                padding: 0.9rem 1.8rem;
+                font-size: 0.95rem;
+            }
+
+            .hero {
+                padding: 2.5rem 0 3.5rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+                margin-bottom: 0.8rem;
+            }
+
+            .hero .subtitle {
+                font-size: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .hero .description {
+                font-size: 0.95rem;
+                margin-bottom: 1.8rem;
+            }
+
+            .section {
+                padding: 3rem 0;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .features-grid {
+                margin-top: 2rem;
+            }
+
+            .feature-card {
+                padding: 1.5rem;
+            }
+
+            .pricing-card {
+                padding: 1.5rem;
+            }
+
+            .plan-name {
+                font-size: 1.3rem;
+            }
+
+            .plan-price {
+                font-size: 2rem;
+            }
+
+            .phone-mockup {
+                width: 130px;
+                height: 260px;
+            }
+
+            .phone-content {
+                padding: 1rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* ハンバーガーメニューの基本スタイル */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 4px;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: #2194F2;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+
+        /* デスクトップでのCTA表示制御 */
+        .mobile-cta {
+            display: none;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-slide-in {
+            animation: slideIn 0.8s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">Pattotan</div>
+            <ul class="nav-links">
+                <li><a href="#features">特徴</a></li>
+                <li><a href="#pricing">料金</a></li>
+                <li><a href="#download">ダウンロード</a></li>
+            </ul>
+            <a href="#download" class="cta-button">今すぐ始める</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1 class="animate-fade-in">Pattotan</h1>
+                <p class="subtitle animate-fade-in">AI生成画像で英単語を視覚的に覚える</p>
+                <p class="description animate-fade-in">
+                    革新的なAI技術を活用して、視覚的連想により英単語の暗記を支援する日本人向け語彙学習アプリです。
+                    単語とAI生成画像を結びつけることで、効率的な記憶定着を実現します。
+                </p>
+                <a href="#download" class="cta-button">無料で始める</a>
+                <div class="app-preview">
+                    <div class="phone-mockup animate-slide-in">
+                        <div class="phone-content">
+                            <div style="font-size: 2rem; margin-bottom: 1rem;">🎨</div>
+                            <div style="font-weight: bold;">AI画像生成</div>
+                        </div>
+                    </div>
+                    <div class="phone-mockup animate-slide-in" style="animation-delay: 0.2s;">
+                        <div class="phone-content">
+                            <div style="font-size: 2rem; margin-bottom: 1rem;">📚</div>
+                            <div style="font-weight: bold;">単語学習</div>
+                        </div>
+                    </div>
+                    <div class="phone-mockup animate-slide-in" style="animation-delay: 0.4s;">
+                        <div class="phone-content">
+                            <div style="font-size: 2rem; margin-bottom: 1rem;">📊</div>
+                            <div style="font-weight: bold;">進捗管理</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">こんなお悩みありませんか？</h2>
+                <div class="features-grid">
+                    <div class="feature-card" style="border-left: 4px solid #F44336; background: linear-gradient(135deg, #fff5f5, #ffffff);">
+                        <div class="feature-icon" style="color: #F44336;">😓</div>
+                        <h3 class="feature-title" style="color: #F44336;">英単語が覚えられない</h3>
+                        <p>何度も繰り返し勉強しているのに、英単語がなかなか頭に入らない。テストの時になると思い出せずに困ってしまう。</p>
+                    </div>
+                    <div class="feature-card" style="border-left: 4px solid #FF9800; background: linear-gradient(135deg, #fff8e1, #ffffff);">
+                        <div class="feature-icon" style="color: #FF9800;">📚</div>
+                        <h3 class="feature-title" style="color: #FF9800;">単調な暗記に飽きる</h3>
+                        <p>単語帳を見ているだけの学習では飽きてしまい、モチベーションが続かない。もっと楽しく学習したい。</p>
+                    </div>
+                    <div class="feature-card" style="border-left: 4px solid #9C27B0; background: linear-gradient(135deg, #f3e5f5, #ffffff);">
+                        <div class="feature-icon" style="color: #9C27B0;">⏰</div>
+                        <h3 class="feature-title" style="color: #9C27B0;">時間がない</h3>
+                        <p>忙しい毎日の中で、まとまった勉強時間を確保するのが難しい。スキマ時間を有効活用したい。</p>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 3rem; padding: 2rem; background: linear-gradient(135deg, #e3f2fd, #ffffff); border-radius: 15px; border: 2px solid #2194F2;">
+                    <h3 style="color: #2194F2; margin-bottom: 1rem; font-size: 1.4rem;">そんなあなたにPattotanが解決策を提供します！</h3>
+                    <p style="color: #555; font-size: 1rem; margin: 0;">AI技術による視覚的学習で、これまでにない効率的で楽しい英単語学習を体験してください。</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="section">
+            <div class="container">
+                <h2 class="section-title">主な特徴</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🎨</div>
+                        <h3 class="feature-title">AI画像生成による視覚学習</h3>
+                        <p>AIを使用した単語に関連する画像の自動生成で、視覚と言語を結びつけた効果的な記憶メカニズムを実現。一人ひとりの学習に最適化されたパーソナライズ画像を提供します。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🤖</div>
+                        <h3 class="feature-title">AI例文生成</h3>
+                        <p>単語の使用場面を理解できる自然な例文をAIが自動生成。文脈理解により実用的な語彙力を身につけることができ、日本人学習者に特化したコンテンツを提供します。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3 class="feature-title">学習分析・進捗管理</h3>
+                        <p>学習進捗や成績をグラフで可視化し、苦手単語の自動検出と復習提案を行います。モチベーション維持のためのストリーク機能も搭載しています。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h3 class="feature-title">効果的なテスト機能</h3>
+                        <p>4択テストで記憶の定着度を確認し、テスト履歴の詳細記録と分析を提供。正答率による学習効果の把握で効率的な学習をサポートします。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔔</div>
+                        <h3 class="feature-title">学習継続サポート</h3>
+                        <p>学習リマインダー通知でモチベーション維持をサポート。カスタマイズ可能な通知設定により、学習習慣の形成をお手伝いします。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💎</div>
+                        <h3 class="feature-title">日本人特化設計</h3>
+                        <p>日本語学習者向けに最適化されたUX・コンテンツで、従来にない記憶定着メカニズムとパーソナライズ学習を実現します。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="pricing" class="pricing-section">
+            <div class="container">
+                <h2 class="section-title">料金プラン</h2>
+                <p style="text-align: center; font-size: 1.1rem; margin-bottom: 2rem; opacity: 0.9;">
+                    あなたの学習レベルと目標に合わせて3つのプランをご用意
+                </p>
+                <div class="pricing-grid">
+                    <div class="pricing-card">
+                        <div class="plan-name">フリー</div>
+                        <div class="plan-price">¥0</div>
+                        <div class="plan-period">永久無料</div>
+                        <ul class="plan-features">
+                            <li>10単語まで登録</li>
+                            <li>1カテゴリ</li>
+                            <li>AI画像生成 3枚/月</li>
+                            <li>AI例文生成 5個/月</li>
+                            <li>テスト機能 1回/月</li>
+                        </ul>
+                        <a href="#download" class="cta-button">無料で始める</a>
+                    </div>
+                    <div class="pricing-card featured">
+                        <div class="plan-name">Basic</div>
+                        <div class="plan-price">¥480</div>
+                        <div class="plan-period">月額</div>
+                        <ul class="plan-features">
+                            <li>100単語まで登録</li>
+                            <li>10カテゴリ</li>
+                            <li>AI画像生成 25枚/月</li>
+                            <li>AI例文生成 50個/月</li>
+                            <li>テスト機能 50回/月</li>
+                            <li>広告なし</li>
+                        </ul>
+                        <a href="#download" class="cta-button">Basicを選ぶ</a>
+                    </div>
+                    <div class="pricing-card">
+                        <div class="plan-name">Pro</div>
+                        <div class="plan-price">¥980</div>
+                        <div class="plan-period">月額</div>
+                        <ul class="plan-features">
+                            <li>無制限単語登録</li>
+                            <li>無制限カテゴリ</li>
+                            <li>AI画像生成 50枚/月</li>
+                            <li>AI例文生成 100個/月</li>
+                            <li>テスト機能 100回/月</li>
+                            <li>全機能利用可能</li>
+                        </ul>
+                        <a href="#download" class="cta-button">Proを選ぶ</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="download" class="download-section">
+            <div class="container">
+                <h2 class="section-title">今すぐダウンロード</h2>
+                <p style="font-size: 1.1rem; margin-bottom: 2.5rem; color: #666;">
+                    App Store、Google Play Storeからダウンロードしてすぐに始められます
+                </p>
+                <div class="download-buttons">
+                    <a href="#" class="download-button">
+                        <span style="font-size: 2rem;">📱</span>
+                        <div>
+                            <div style="font-size: 0.8rem;">Download on the</div>
+                            <div style="font-weight: bold;">App Store</div>
+                        </div>
+                    </a>
+                    <a href="#" class="download-button">
+                        <span style="font-size: 2rem;">🤖</span>
+                        <div>
+                            <div style="font-size: 0.8rem;">Get it on</div>
+                            <div style="font-weight: bold;">Google Play</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Pattotan. All rights reserved. | AI技術で語学学習に革新を。</p>
+            <p style="margin-top: 1rem; opacity: 0.7;">視覚的記憶と効率的学習の新しいスタンダード</p>
+        </div>
+    </footer>
+
+    <script>
+        // スムーススクロール
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // スクロール時のヘッダー透明度調整
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            const scrolled = window.pageYOffset;
+            
+            if (scrolled > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>
