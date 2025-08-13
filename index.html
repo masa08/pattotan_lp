@@ -171,6 +171,46 @@
             color: #555;
         }
 
+        .hero-images {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 3rem;
+            max-width: 1100px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0 1rem;
+            flex-wrap: nowrap;
+        }
+
+        .hero-image-wrapper {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            flex: 1;
+            max-width: 250px;
+        }
+
+        .hero-image-wrapper:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero-image-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .hero-image-wrapper:hover img {
+            transform: scale(1.05);
+        }
+
         .app-preview {
             display: flex;
             justify-content: center;
@@ -521,6 +561,18 @@
                 margin-bottom: 1.8rem;
             }
 
+            .hero-images {
+                flex-wrap: wrap;
+                gap: 1rem;
+                margin-top: 2rem;
+            }
+
+            .hero-image-wrapper {
+                border-radius: 15px;
+                flex: 1 1 calc(50% - 0.5rem);
+                max-width: calc(50% - 0.5rem);
+            }
+
             .section {
                 padding: 3rem 0;
             }
@@ -633,31 +685,21 @@
             <div class="container">
                 <h1 class="animate-fade-in">Pattotan</h1>
                 <p class="subtitle animate-fade-in">AI生成画像で英単語を視覚的に覚える</p>
-                <p class="description animate-fade-in">
-                    革新的なAI技術を活用して、視覚的連想により英単語の暗記を支援する日本人向け語彙学習アプリです。
-                    単語とAI生成画像を結びつけることで、効率的な記憶定着を実現します。
-                </p>
-                <a href="#download" class="cta-button">無料で始める</a>
-                <div class="app-preview">
-                    <div class="phone-mockup animate-slide-in">
-                        <div class="phone-content">
-                            <div style="font-size: 2rem; margin-bottom: 1rem;">🎨</div>
-                            <div style="font-weight: bold;">AI画像生成</div>
-                        </div>
+                <div class="hero-images animate-fade-in">
+                    <div class="hero-image-wrapper">
+                        <img src="images/1267@3x.png" alt="Pattotan アプリ画面1" loading="lazy">
                     </div>
-                    <div class="phone-mockup animate-slide-in" style="animation-delay: 0.2s;">
-                        <div class="phone-content">
-                            <div style="font-size: 2rem; margin-bottom: 1rem;">📚</div>
-                            <div style="font-weight: bold;">単語学習</div>
-                        </div>
+                    <div class="hero-image-wrapper">
+                        <img src="images/1265@3x.png" alt="Pattotan アプリ画面2" loading="lazy">
                     </div>
-                    <div class="phone-mockup animate-slide-in" style="animation-delay: 0.4s;">
-                        <div class="phone-content">
-                            <div style="font-size: 2rem; margin-bottom: 1rem;">📊</div>
-                            <div style="font-weight: bold;">進捗管理</div>
-                        </div>
+                    <div class="hero-image-wrapper">
+                        <img src="images/1268@3x.png" alt="Pattotan アプリ画面3" loading="lazy">
+                    </div>
+                    <div class="hero-image-wrapper">
+                        <img src="images/1269@3x.png" alt="Pattotan アプリ画面4" loading="lazy">
                     </div>
                 </div>
+                <a href="#download" class="cta-button" style="margin-top: 2.5rem; display: inline-block;">無料で始める</a>
             </div>
         </section>
 
